@@ -1,0 +1,36 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="layout layout--3">
+    <div class="container">
+        <div>
+
+        </div>
+
+        <div class="roomListRoom">
+            <div style="text-align:center ;">
+                <h1 style="font-size:30px ;">Hey, let's start our next workout!</h1>
+                <br />
+                <h1 style="font-size:22px ;">Are you ready?</h1>
+            </div>
+
+
+            <div style="float: left">
+                <a href="{% url 'home' %}"><h3>CANCEL</h3></a>
+            </div> 
+
+            <div style="float: right">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn--main">Start Workout</button>
+                </form>
+            </div> 
+        </div>
+
+        <div>
+            
+        </div>
+    </div>
+</main>
+
+{% endblock %}

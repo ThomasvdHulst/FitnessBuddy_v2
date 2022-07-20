@@ -20,15 +20,21 @@
       <nav class="header__menu">
 
       {% if request.user.is_authenticated %}
-        <div class="header_exercise_library">
+        <div>
           <a href="{% url 'exercise-library' %}">
             Exercise Library
+          </a>
+        </div>
+
+        <div>
+          <a href="{% url 'start-workout' %}">
+            Start New Workout!
           </a>
         </div>
       {% endif %}
 
       {% if request.user.is_staff %}
-        <div class="header_admin">
+        <div>
           <a href="/admin">
             Admin
           </a>

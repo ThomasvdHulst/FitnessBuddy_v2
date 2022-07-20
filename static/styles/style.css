@@ -1163,3 +1163,14 @@ a {
   color: var(--color-main);
   font-weight: 1.4rem;
 }
+
+
+
+
+
+.blockWorkout {
+    margin-bottom: 2.4rem;
+    background-color: var(--color-dark);
+    border-radius: 1rem;
+    padding: 2rem;
+}

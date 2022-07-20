@@ -21,5 +21,7 @@ urlpatterns = [
 
     path('activity/', views.activityPage, name="activity"),
 
-    path('exercise-library', views.exerciseLibrary, name="exercise-library")
+    path('exercise-library', views.exerciseLibrary, name="exercise-library"),
+    path('start-workout', views.startWorkout, name="start-workout"),
+    path('workout', views.workout, name="workout")
 ]

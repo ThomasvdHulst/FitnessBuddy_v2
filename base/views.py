@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q #Lets you use and/or for filter
 from django.contrib.auth import authenticate, login, logout 
-from .models import Room, Topic, Message, User, Exercise
+from .models import Room, Topic, Message, User, Exercise, Workout
 from .forms import RoomForm, UserForm, MyUserCreationForm
 # Create your views here.
 
@@ -192,7 +192,34 @@ def activityPage(request):
     room_messages = Message.objects.all()
     return render(request, 'base/activity.html', {'room_messages':room_messages})
 
+@login_required(login_url='login')
 def exerciseLibrary(request):
-    exercises = Exercise.objects.order_by('name')
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+
+    #exercises = Exercise.objects.order_by('name')
+
+    exercises = Exercise.objects.filter(
+        Q(name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
+        Q(description__icontains=q) |
+        Q(bodypartTrained__icontains=q)
+        )
+
     context = {'exercises':exercises}
     return render(request, 'base/exercise_library.html', context)
+
+@login_required(login_url='login')
+def startWorkout(request):
+    if request.method == 'POST':
+        workout = Workout(user=request.user)
+        workout.save()
+        return redirect('workout')
+
+    context = {}
+    return render(request, 'base/startworkout.html', context)
+
+@login_required(login_url='login')
+def workout(request):
+    workout = Workout.objects.last()
+    print(workout.user)
+    context = {}
+    return render(request, 'base/workout.html', context)
