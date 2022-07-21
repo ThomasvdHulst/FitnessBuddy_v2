@@ -9,7 +9,13 @@
 
         <div class="roomListRoom">
             <div>
-                <h1 style="font-size:30px ;">{{workout.name}}</h1>
+                <h1 style="size:30px ;">{{workout.name}}</h1>
+
+                <hr />
+
+                <div style="float: right;">
+                     created {{workout.created|timesince}} ago
+                </div>
 
                 <div style="float: left">
                     <form class="form" action="" method="POST">
