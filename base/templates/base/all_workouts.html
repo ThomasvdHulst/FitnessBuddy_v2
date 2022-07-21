@@ -1,0 +1,52 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="layout layout--3">
+    <div class="container">
+        <div>
+
+        </div>
+
+        <div class="roomListRoom">
+            <div style="text-align:center ;">
+            <h1>Here you can see all your awesome workouts! In total you have completed {{workouts.count}} of them!</h1>
+            </div>
+
+            {% for workout in workouts %}
+                <div class="card mt-2">
+                    <div class="card-header">
+                        <div style="float:left ;">
+                            <strong>{{workout.name}} &nbsp; </strong>
+                        </div>
+                        <div style="float:left;">
+                            <a href="{% url 'delete-workout' workout.id %}"> delete </a>
+                        </div>
+                        <div style="float:right ;">
+                            {{workout.created|timesince}} ago
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {% for exercise in workout.exercise.all %}
+                        <div>
+                            <p>{{exercise.name}}</p>
+                        </div>
+                        <hr />
+                        {% endfor %}
+                    </div>
+                </div>
+                <hr><br />
+            {% empty %}
+                <br />
+                <div>
+                    <h3>You haven't completed any workouts yet! Start your first one <a href="{% url 'start-workout' %}">here</a>!</h3>
+                </div>
+            {% endfor %} 
+        </div>
+
+        <div>
+            
+        </div>
+    </div>
+</main>
+
+{% endblock %}

@@ -8,38 +8,76 @@
         </div>
 
         <div class="roomListRoom">
-            <h1>Start by giving your workout an awesome name:</h1>
-
-
-
-            <form class="header__search" method="POST">
-                {% csrf_token %}
-                <label>
-                  <input name="workoutname" placeholder="Workout..." value="{{workout.name}}"/>
-                </label>
-            </form>
-            <br />
-
             <div>
-                {% if workoutStarted == 'YES' %}
+                <h1 style="font-size:30px ;">{{workout.name}}</h1>
+
                 <div style="float: left">
                     <form class="form" action="" method="POST">
                         {% csrf_token %}
                         <div class="form__action">
-                            <button class="btn btn--main" type="submit" name="addexercisebtn">Add Exercise</button>
+                            <button class="btn btn--main" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample" name="addexercisebtn">Add exercise</button>
                         </div>
                     </form>
-                </div> 
-                {% endif %}
+                </div>
+
+                <br /><br />
+                
+                <div class="collapse" id="collapseExample">
+                    {% for exercise in exercises %}
+                        <div class="card mt-2">
+                            <div class="card-header"><strong>{{exercise.name}}</strong></div>
+                            <div class="card-body">
+                                <div>
+                                    <img class="image" src="{{ exercise.image.url }}" height="200px" width="200px"><br/>
+                                </div>
+                                <div>
+                                    <p>{{exercise.description}}</p>
+                                </div>
+                                <div>
+                                    <h3>Body part trained:</h3>
+                                    <p>{{exercise.bodypartTrained}}</p>
+
+                                    <div style="float:right ;">
+                                        <form method="post">
+                                            {% csrf_token%}
+                                            <button class="btn btn--main" type="submit" name="addNewExercisebtn" value="{{ exercise.id }}">Add Exercise</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr><br />
+                    {% endfor %}
+                </div>
+
+                <div>
+                    {% for exercise in currentExercises %}
+                                <div class="card mt-2">
+                                    <div class="card-header"><strong>{{exercise.name}}</strong></div>
+                                </div>
+                    {% endfor %}
+                </div>
+                <br />
             </div>
 
-            <div style="float:right;">
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="form__action">
-                        <button class="btn btn--main" type="submit" name="cancelbtn">Cancel Workout</button>
-                    </div>
-                </form>
+            <div>
+                <div style="float:right;">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form__action">
+                            <button class="btn btn--main" type="submit" name="completebtn">Complete Workout</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="float:left;">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form__action">
+                            <button class="btn btn--main" type="submit" name="cancelbtn">Cancel Workout</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 

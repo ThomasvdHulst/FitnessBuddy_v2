@@ -1,3 +1,4 @@
+from multiprocessing import context
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
@@ -210,7 +211,8 @@ def exerciseLibrary(request):
 @login_required(login_url='login')
 def startWorkout(request):
     if request.method =='POST':
-        workout = Workout(user=request.user)
+        workoutname = request.POST.get('workoutname') if request.POST.get('workoutname') != None else ''
+        workout = Workout(user=request.user, name=workoutname)
         workout.save()
         return redirect('workout')
 
@@ -220,22 +222,71 @@ def startWorkout(request):
 @login_required(login_url='login')
 def workout(request):
     workout = Workout.objects.filter(user=request.user).last()
-    workoutStarted = 'NO'
+    exercises = Exercise.objects.all()
+    currentExercises = workout.exercise.all()
 
-    workoutnamebtn = request.POST.get('workoutname')
-    addexercisebtn = request.POST.get('addexercisebtn')
     cancelbtn = request.POST.get('cancelbtn')
+    addNewExercisebtn = request.POST.get('addNewExercisebtn')
+    completebtn = request.POST.get('completebtn')
 
-    if workoutnamebtn != None:
-        workoutname = request.POST.get('workoutname') if request.POST.get('workoutname') != None else ''
-        workout.name = workoutname
-        workout.save()
-        workoutStarted = 'YES'
-
-    elif cancelbtn != None:
-        print('test')
+    if cancelbtn != None:
         workout.delete()
         return redirect('home')
 
-    context = {'workout':workout, 'workoutStarted':workoutStarted}
+    elif addNewExercisebtn != None:
+        exerciseChosen = Exercise.objects.filter(id=addNewExercisebtn).first()
+        workout.exercise.add(exerciseChosen)
+        workout.save()
+        currentExercises = workout.exercise.all()
+
+    elif completebtn != None:
+        if workout.exercise.exists():
+            workout.completed = 'YES'
+            workout.save()
+            return redirect('workout-completed')
+        
+        else:
+             messages.error(request, 'Please at a exercise before completing your workout.')
+
+    context = {'workout':workout, 'exercises':exercises, 'currentExercises':currentExercises}
     return render(request, 'base/workout.html', context)
+
+@login_required(login_url='login')
+def workoutCompleted(request):
+    workouts = Workout.objects.filter(
+        Q(user=request.user) &
+        Q(completed='YES')
+    )
+    
+    lastWorkout = Workout.objects.filter(
+        Q(user__exact=request.user) &
+        Q(completed='YES')
+    ).last()
+    lastWorkoutExercises = lastWorkout.exercise.all()
+
+    numberOfWorkouts = workouts.count()
+
+    context = {'numberOfWorkouts':numberOfWorkouts, 'lastWorkoutExercises':lastWorkoutExercises}
+    return render(request, 'base/workout_completed', context)
+
+@login_required(login_url='login')
+def allWorkouts(request):
+    workouts = Workout.objects.filter(
+        Q(user=request.user) &
+        Q(completed='YES')
+    )
+
+    context = {'workouts':workouts}
+    return render(request, 'base/all_workouts.html', context)
+
+@login_required(login_url='login')
+def deleteWorkout(request, pk):
+    workout = Workout.objects.get(id=pk)
+
+    if request.user != workout.user:
+        return HttpResponse('You are not allowed here!')
+
+    if request.method == 'POST':
+        workout.delete()
+        return redirect('all-workouts')
+    return render(request, 'base/delete.html', {'obj':workout})

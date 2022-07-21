@@ -23,5 +23,8 @@ urlpatterns = [
 
     path('exercise-library', views.exerciseLibrary, name="exercise-library"),
     path('start-workout', views.startWorkout, name="start-workout"),
-    path('workout', views.workout, name="workout")
+    path('workout', views.workout, name="workout"),
+    path('workout-completed', views.workoutCompleted, name="workout-completed"),
+    path('all-workouts', views.allWorkouts, name="all-workouts"),
+    path('delete-workout/<str:pk>/', views.deleteWorkout, name="delete-workout"),
 ]

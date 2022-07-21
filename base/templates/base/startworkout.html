@@ -11,21 +11,22 @@
             <div style="text-align:center ;">
                 <h1 style="font-size:30px ;">Hey, let's start our next workout!</h1>
                 <br />
-                <h1 style="font-size:22px ;">Are you ready?</h1>
             </div>
 
+            <div style="float: right">
+                <h1>Start by giving your workout an awesome name:</h1>
+
+                <form class="header__search" method="POST">
+                    {% csrf_token %}
+                    <label>
+                      <input name="workoutname" placeholder="Workout..." value="{{workout.name}}"/>
+                    </label>
+                </form>
+                <br />
+            </div> 
 
             <div style="float: left">
                 <a href="{% url 'home' %}"><h3>CANCEL</h3></a>
-            </div> 
-
-            <div style="float: right">
-                <form class="form" action="" method="POST">
-                    {% csrf_token %}
-                    <div class="form__action">
-                        <button class="btn btn--main" type="submit">YES</button>
-                    </div>
-                </form>
             </div> 
         </div>
 

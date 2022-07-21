@@ -14,6 +14,27 @@
   --color-error: #fc4b0b;
 }
 
+/*========== Own styling ==========*/
+.image {
+  min-height: 300px;
+  max-width: 100%;
+  height: auto;
+}
+
+.mt-2 {
+  background-color: var(--color-bg);  
+}
+
+.card-header {
+  background-color: var(--color-dark-medium);
+}
+
+.card-body{
+  background-color: var(--color-dark);
+}
+
+
+
 /*========== base styles ==========*/
 
 * {

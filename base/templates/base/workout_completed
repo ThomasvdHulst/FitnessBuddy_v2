@@ -1,0 +1,35 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<main class="layout layout--3">
+    <div class="container">
+        <div>
+
+        </div>
+
+        <div class="roomListRoom">
+           <h1>Well Done! You now have completed {{numberOfWorkouts}} workout(s) in total!</h1>
+           <h2>This workout you've done the following exercises:</h2>
+           <br />
+
+           <div>
+                {% for exercise in lastWorkoutExercises %}
+                            <div class="card mt-2">
+                                <div class="card-header"><strong>{{exercise.name}}</strong></div>
+                            </div>
+                {% endfor %}
+                <br />
+            </div>
+
+            <div style="text-align: center;">
+                <a href="{% url 'home' %}"><h3>HOME</h3></a>
+            </div>
+        </div>
+
+        <div>
+            
+        </div>
+    </div>
+</main>
+
+{% endblock %}

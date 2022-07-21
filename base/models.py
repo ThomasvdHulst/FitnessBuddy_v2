@@ -38,6 +38,7 @@ class Workout(models.Model):
     exercise = models.ManyToManyField(Exercise)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+    completed = models.CharField(max_length=5, default='NO')
 
     def __str__(self):
         return self.name

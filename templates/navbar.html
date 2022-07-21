@@ -6,7 +6,7 @@
         <img src="{% static  'images/logoFDB.jpg' %}" />
         <h1>FitnessBuddy</h1>
       </a>
-      <form class="header__search" method="GET" action="{% url 'home' %}">
+      <!-- <form class="header__search" method="GET" action="{% url 'home' %}">
         <label>
           <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
             <title>search</title>
@@ -16,8 +16,8 @@
           </svg>
           <input name="q" placeholder="Search for rooms..." />
         </label>
-      </form>
-      <nav class="header__menu">
+      </form> -->
+      
 
       {% if request.user.is_authenticated %}
         <div>
@@ -31,6 +31,12 @@
             Start New Workout!
           </a>
         </div>
+
+        <div>
+          <a href="{% url 'all-workouts' %}">
+            Ur Workouts
+          </a>
+        </div>
       {% endif %}
 
       {% if request.user.is_staff %}
@@ -40,6 +46,9 @@
           </a>
       </div>
       {% endif %}
+
+
+      <nav class="header__menu">
 
         <!-- Logged In -->
         {% if request.user.is_authenticated %}
