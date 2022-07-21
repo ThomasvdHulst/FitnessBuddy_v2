@@ -8,7 +8,39 @@
         </div>
 
         <div class="roomListRoom">
+            <h1>Start by giving your workout an awesome name:</h1>
 
+
+
+            <form class="header__search" method="POST">
+                {% csrf_token %}
+                <label>
+                  <input name="workoutname" placeholder="Workout..." value="{{workout.name}}"/>
+                </label>
+            </form>
+            <br />
+
+            <div>
+                {% if workoutStarted == 'YES' %}
+                <div style="float: left">
+                    <form class="form" action="" method="POST">
+                        {% csrf_token %}
+                        <div class="form__action">
+                            <button class="btn btn--main" type="submit" name="addexercisebtn">Add Exercise</button>
+                        </div>
+                    </form>
+                </div> 
+                {% endif %}
+            </div>
+
+            <div style="float:right;">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form__action">
+                        <button class="btn btn--main" type="submit" name="cancelbtn">Cancel Workout</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <div>

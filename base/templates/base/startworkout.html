@@ -20,9 +20,11 @@
             </div> 
 
             <div style="float: right">
-                <form action="" method="POST">
+                <form class="form" action="" method="POST">
                     {% csrf_token %}
-                    <button class="btn btn--main">Start Workout</button>
+                    <div class="form__action">
+                        <button class="btn btn--main" type="submit">YES</button>
+                    </div>
                 </form>
             </div> 
         </div>

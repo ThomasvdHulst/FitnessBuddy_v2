@@ -209,7 +209,7 @@ def exerciseLibrary(request):
 
 @login_required(login_url='login')
 def startWorkout(request):
-    if request.method == 'POST':
+    if request.method =='POST':
         workout = Workout(user=request.user)
         workout.save()
         return redirect('workout')
@@ -219,7 +219,23 @@ def startWorkout(request):
 
 @login_required(login_url='login')
 def workout(request):
-    workout = Workout.objects.last()
-    print(workout.user)
-    context = {}
+    workout = Workout.objects.filter(user=request.user).last()
+    workoutStarted = 'NO'
+
+    workoutnamebtn = request.POST.get('workoutname')
+    addexercisebtn = request.POST.get('addexercisebtn')
+    cancelbtn = request.POST.get('cancelbtn')
+
+    if workoutnamebtn != None:
+        workoutname = request.POST.get('workoutname') if request.POST.get('workoutname') != None else ''
+        workout.name = workoutname
+        workout.save()
+        workoutStarted = 'YES'
+
+    elif cancelbtn != None:
+        print('test')
+        workout.delete()
+        return redirect('home')
+
+    context = {'workout':workout, 'workoutStarted':workoutStarted}
     return render(request, 'base/workout.html', context)
