@@ -15,6 +15,34 @@
 }
 
 /*========== Own styling ==========*/
+.title h2 {
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.4rem;
+
+  font-size:50px;
+  text-align:center;
+
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--color-light);
+  letter-spacing: 1px;
+}
+
+.title p {
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.4rem;
+
+  font-size:30px;
+  text-align:center;
+
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--color-light);
+  letter-spacing: 1px;
+}
+
 .image {
   min-height: 300px;
   max-width: 100%;

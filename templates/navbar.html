@@ -18,14 +18,13 @@
         </label>
       </form> -->
       
-
-      {% if request.user.is_authenticated %}
         <div>
           <a href="{% url 'exercise-library' %}">
             Exercise Library
           </a>
         </div>
 
+        {% if request.user.is_authenticated %}
         <div>
           <a href="{% url 'start-workout' %}">
             Start New Workout!

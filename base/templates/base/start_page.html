@@ -1,0 +1,26 @@
+<div class="roomListRoom">
+    {% if request.user.is_authenticated %}
+    <div>
+        <h1>Welcome {{ request.user.name }}!</h1>
+    </div>
+
+    <div>
+        <p>This is your dashbord, where you can find everything you need!</p>
+        <p>Want to start a new workout? Click <a href="{% url 'start-workout' %}">here</a> and lets do this!</p>
+    </div>
+    
+    {% else %}
+    <div>
+        <h1>Welcome!</h1>
+    </div>
+
+    <div>
+        <p>This is FitnessBuddy, a site made to help you get fit, from beginning to end! Whether you are completely new
+            to fitness or already have a couple of years in, we'll help you get to your next goal! All information about
+            exercises and fitness in general can be found in <a href="{% url 'exercise-library' %}">Exercise Library</a> but we highly 
+            recommend creating an account to set and achieve personally optimized goals, track your trainings and get even buffer!
+            Creating an account can be done <a href="{% url 'register' %}">here</a>! Already have an account? Awesome, log in <a href="{% url 'login' %}">here</a>!
+        </p>
+    </div>
+    {% endif %}
+</div>

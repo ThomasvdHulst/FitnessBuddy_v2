@@ -4,12 +4,16 @@
     <main class="layout layout--3">
       <div class="container">
         <!-- Topics Start -->
-        {% include 'base/topics_component.html' %}
+        <!-- {% include 'base/topics_component.html' %} -->
         <!-- Topics End -->
+        <div>
+
+        </div>
 
         <!-- Room List Start -->
         <div class="roomList">
-          <div class="mobile-menu">
+          <!-- Mobile window start -->
+          <!-- <div class="mobile-menu">
             <form action="{% url 'home' %}" method="GET" class="header__search">
               <label>
                 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
@@ -25,15 +29,14 @@
               <a class="btn btn--main btn--pill" href="{% url 'topics' %}">Browse Topics</a>
               <a class="btn btn--main btn--pill" href="{% url 'activity' %}">Recent Activities</a>
             </div>
-          </div>
+          </div> -->
+          <!-- Mobile window end -->
 
-          <div class="roomList__header">
-            <div>
-              <h2>Study Room</h2>
-              <p>{{room_count}} Rooms available</p>
-            </div>
+          <div class="title">
+            <h2>FitnessBuddy</h2>
+            <p>What are we training today?</p>
 
-            <a class="btn btn--main" href="{% url 'create-room' %}">
+            <!-- <a class="btn btn--main" href="{% url 'create-room' %}">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
                 <title>add</title>
                 <path
@@ -41,16 +44,19 @@
                 ></path>
               </svg>
               Create Room
-            </a>
+            </a> -->
           </div>
 
-          {% include 'base/feed_component.html' %}
-
+          <!-- {% include 'base/feed_component.html' %} -->
+          {% include 'base/start_page.html' %}
         </div>
         <!-- Room List End -->
 
         <!-- Activities Start -->
-        {% include 'base/activity_component.html' %}
+        <!-- {% include 'base/activity_component.html' %} -->
+        <div>
+
+        </div>
         <!-- Activities End -->
       </div>
     </main>

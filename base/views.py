@@ -1,4 +1,3 @@
-from multiprocessing import context
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
@@ -45,7 +44,6 @@ def logoutUser(request):
 
 def registerPage(request):
     form = MyUserCreationForm()
-
     if request.method == 'POST':
         form = MyUserCreationForm(request.POST)
         if form.is_valid():
@@ -54,8 +52,14 @@ def registerPage(request):
             user.save()
             login(request, user)
             return redirect('home')
-        else:
-            messages.error(request, 'An error occurred during registration.')
+        elif any(char.isdigit() for char in request.POST.get('name')):
+             messages.error(request, 'Please only use letters for your name.')
+        elif len(request.POST.get('name')) < 2:
+            messages.error(request, 'Please fill in a correct name.')
+        elif len(request.POST.get('password1')) < 8:
+            messages.error(request, 'Please create a password with atleast 8 characters.')
+        elif request.POST.get('password1') != request.POST.get('password2'):
+            messages.error(request, 'Please fill in the same passwords.')
 
     return render(request, 'base/login_register.html', {'form':form})
 
@@ -193,7 +197,6 @@ def activityPage(request):
     room_messages = Message.objects.all()
     return render(request, 'base/activity.html', {'room_messages':room_messages})
 
-@login_required(login_url='login')
 def exerciseLibrary(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
 
