@@ -12,19 +12,17 @@ class User(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
-class Exercise(models.Model):
-    STATUS = (
-        ('Back', 'Back'),
-        ('Chest', 'Chest'),
-        ('Legs', 'Legs'),
-        ('Tricep', 'Tricep'),
-        ('Bicep', 'Bicep'),
-    )
+class BodyPart(models.Model):
+    name = models.CharField(max_length=10)
 
+    def __str__(self):
+        return self.name
+
+class Exercise(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(null=True)
     image = models.ImageField(null=True, blank=True)
-    bodypartTrained = models.CharField(max_length=20, choices=STATUS)
+    bodypart_trained = models.ForeignKey(BodyPart, on_delete=models.CASCADE, null=True)
 
     class Meta:
         ordering = ['name']

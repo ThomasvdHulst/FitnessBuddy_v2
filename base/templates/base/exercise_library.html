@@ -4,9 +4,22 @@
     <main class="layout layout--3">
       <div class="container">
         <!-- Topics Start -->
-        <div>
-
+        <div class="topics">
+          <div class="topics__header">
+            <h2>Search on bodypart trained:</h2>
+          </div>
+          <ul class="topics__list">
+            <li>
+              <a href="{% url 'exercise-library' %}" class="active">All exercises</a>
+            </li>
+            {% for bodypart in bodyparts %}
+            <li>
+              <a href="{% url 'exercise-library' %}?q={{bodypart.name}}">{{bodypart.name}}</a>
+            </li>
+            {% endfor %}
+          </ul>
         </div>
+      
         <!-- {% include 'base/topics_component.html' %} -->
         <!-- Topics End -->
 
@@ -42,7 +55,7 @@
                             </div>
                             <div>
                                 <h3>Body part trained:</h3>
-                                <p>{{exercise.bodypartTrained}}</p>
+                                <p>{{exercise.bodypart_trained}}</p>
                             </div>
                         </div>
                     </div>
