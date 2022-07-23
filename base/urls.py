@@ -27,4 +27,5 @@ urlpatterns = [
     path('workout-completed', views.workoutCompleted, name="workout-completed"),
     path('all-workouts', views.allWorkouts, name="all-workouts"),
     path('delete-workout/<str:pk>/', views.deleteWorkout, name="delete-workout"),
+    path('create-exercise', views.createExercise, name="create-exercise"),
 ]

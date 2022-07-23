@@ -26,7 +26,10 @@
         <!-- Room List Start -->
         <div class="roomList">
             <div class="roomListRoom">
-                <h1>Welcome to the exercise-library {{request.user.name}}!</h1>
+                <h1 style="text-align:center;">Welcome to the exercise-library {{request.user.name}}!</h1>
+                <p style="text-align:center;">Here you can find all the exercises you could possible think off! Can't find the
+                  exact exercise you want or designed a new one? Create your own exercise <a href="{% url 'create-exercise' %}">here</a>!
+                </p>
                 <br />
                 <form class="header__search" method="GET" action="{% url 'exercise-library' %}">
                     <label>
@@ -42,29 +45,33 @@
                   <nav class="header__menu">
 
                 <br />
-                {% for exercise in exercises %}
-                    <div class="card mt-2">
-                        <div class="card-header"><strong>{{exercise.name}}</strong></div>
-                        <div class="card-body">
-                            <div>
-                                <img class="image" src="{{ exercise.image.url }}"><br/>
-                            </div>
-                            <div>
-                              <br />
-                                <p>{{exercise.description}}</p>
-                            </div>
-                            <div>
-                                <h3>Body part trained:</h3>
-                                <p>{{exercise.bodypart_trained}}</p>
-                            </div>
+
+                {% for exercise in totalexercises %}
+                <div class="card mt-2">
+                    <div class="card-header"><strong>{{exercise.name}}</strong></div>
+                    <div class="card-body">
+                      {% if exercise.image %}
+                        <div>
+                            <img class="image" src="{{ exercise.image.url }}"><br/>
+                        </div>
+                        <br />
+                        {% endif %}
+                        <div>
+                          
+                            <p>{{exercise.description}}</p>
+                        </div>
+                        <div>
+                            <h3>Body part trained:</h3>
+                            <p>{{exercise.bodypart_trained}}</p>
                         </div>
                     </div>
-                    <hr><br />
+                </div>
+                <hr><br />
                 {% empty %}
-                    <div>
-                        <h3>Sadly no results have returned... Please check for spelling errors or try single words instead of senctences!</h3>
-                    </div>
-                {% endfor %}       
+                <div>
+                    <h3>Sadly no results for our original exercises have returned... Please check for spelling errors or try single words instead of senctences!</h3>
+                </div>
+                {% endfor %}
             </div>  
         </div>
         <!-- Room List End -->

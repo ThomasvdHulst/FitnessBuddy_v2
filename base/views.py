@@ -4,8 +4,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q #Lets you use and/or for filter
 from django.contrib.auth import authenticate, login, logout 
-from .models import Room, Topic, Message, User, Exercise, Workout, BodyPart
-from .forms import RoomForm, UserForm, MyUserCreationForm
+from .models import Room, Topic, Message, User, Exercise, Workout, BodyPart, OwnExercise
+from .forms import ExerciseForm, RoomForm, UserForm, MyUserCreationForm
+
+from itertools import chain
 # Create your views here.
 
 def loginPage(request):
@@ -204,7 +206,6 @@ def activityPage(request):
 
 def exerciseLibrary(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
-    print(q)
 
     bodyparts = BodyPart.objects.all()
 
@@ -215,14 +216,21 @@ def exerciseLibrary(request):
         Q(bodypart_trained__name__icontains=q)
         )
 
+    ownexercises = OwnExercise.objects.filter(
+        Q(name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
+        Q(description__icontains=q) |
+        Q(bodypart_trained__name__icontains=q)
+        )
+        
+    totalexercises = list(chain(exercises, ownexercises))
 
-    context = {'exercises':exercises, 'bodyparts':bodyparts}
+    context = {'exercises':exercises, 'bodyparts':bodyparts, 'ownexercises':ownexercises, 'totalexercises':totalexercises}
     return render(request, 'base/exercise_library.html', context)
 
 @login_required(login_url='login')
 def startWorkout(request):
     if request.method =='POST':
-        workoutname = request.POST.get('workoutname') if request.POST.get('workoutname') != None else ''
+        workoutname = request.POST.get('workoutname') 
         workout = Workout(user=request.user, name=workoutname)
         workout.save()
         return redirect('workout')
@@ -232,13 +240,28 @@ def startWorkout(request):
 
 @login_required(login_url='login')
 def workout(request):
-    workout = Workout.objects.filter(user=request.user).last()
-    exercises = Exercise.objects.all()
+    workout = Workout.objects.filter(user=request.user).first()
     currentExercises = workout.exercise.all()
+    currentOwnExercises = workout.ownexercise.all()
 
     cancelbtn = request.POST.get('cancelbtn')
     addNewExercisebtn = request.POST.get('addNewExercisebtn')
+    addOwnNewExercisebtn = request.POST.get('addOwnNewExercisebtn')
     completebtn = request.POST.get('completebtn')
+
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+
+    exercises = Exercise.objects.filter(
+        Q(name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
+        Q(description__icontains=q) |
+        Q(bodypart_trained__name__icontains=q)
+        )
+
+    ownexercises = OwnExercise.objects.filter(
+        Q(name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
+        Q(description__icontains=q) |
+        Q(bodypart_trained__name__icontains=q)
+        )
 
     if cancelbtn != None:
         workout.delete()
@@ -249,9 +272,17 @@ def workout(request):
         workout.exercise.add(exerciseChosen)
         workout.save()
         currentExercises = workout.exercise.all()
+        return redirect('workout')
+
+    elif addOwnNewExercisebtn != None:
+        exerciseChosen = OwnExercise.objects.filter(id=addOwnNewExercisebtn).first()
+        workout.ownexercise.add(exerciseChosen)
+        workout.save()
+        currentOwnExercises = workout.ownexercise.all()
+        return redirect('workout')
 
     elif completebtn != None:
-        if workout.exercise.exists():
+        if workout.exercise.exists() or workout.ownexercise.exists():
             workout.completed = 'YES'
             workout.save()
             return redirect('workout-completed')
@@ -259,7 +290,7 @@ def workout(request):
         else:
              messages.error(request, 'Please at a exercise before completing your workout.')
 
-    context = {'workout':workout, 'exercises':exercises, 'currentExercises':currentExercises}
+    context = {'workout':workout, 'exercises':exercises, 'currentExercises':currentExercises, 'ownexercises':ownexercises, 'currentOwnExercises':currentOwnExercises}
     return render(request, 'base/workout.html', context)
 
 @login_required(login_url='login')
@@ -274,11 +305,12 @@ def workoutCompleted(request):
         Q(completed='YES')
     ).last()
     lastWorkoutExercises = lastWorkout.exercise.all()
+    lastWorkoutOwnExercises = lastWorkout.ownexercise.all()
 
     numberOfWorkouts = workouts.count()
 
-    context = {'numberOfWorkouts':numberOfWorkouts, 'lastWorkoutExercises':lastWorkoutExercises}
-    return render(request, 'base/workout_completed', context)
+    context = {'numberOfWorkouts':numberOfWorkouts, 'lastWorkoutExercises':lastWorkoutExercises, 'lastWorkoutOwnExercises':lastWorkoutOwnExercises}
+    return render(request, 'base/workout_completed.html', context)
 
 @login_required(login_url='login')
 def allWorkouts(request):
@@ -301,3 +333,19 @@ def deleteWorkout(request, pk):
         workout.delete()
         return redirect('all-workouts')
     return render(request, 'base/delete.html', {'obj':workout})
+
+def createExercise(request):
+    form = ExerciseForm()
+
+    if request.method == 'POST':
+        form = ExerciseForm(request.POST)
+        if form.is_valid():
+            exercise = form.save(commit=False)
+            exercise.user = request.user
+            exercise.save()
+            messages.success(request, 'Exercise created!')
+            return redirect('exercise-library')
+
+
+    context ={'form':form}
+    return render(request, 'base/create_exercise.html', context)

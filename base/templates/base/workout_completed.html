@@ -18,6 +18,12 @@
                                 <div class="card-header"><strong>{{exercise.name}}</strong></div>
                             </div>
                 {% endfor %}
+
+                {% for exercise in lastWorkoutOwnExercises %}
+                <div class="card mt-2">
+                    <div class="card-header"><strong>{{exercise.name}}</strong></div>
+                </div>
+                {% endfor %}
                 <br />
             </div>
 

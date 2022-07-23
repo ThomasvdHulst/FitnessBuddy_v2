@@ -32,6 +32,12 @@
                         </div>
                         <hr />
                         {% endfor %}
+                        {% for exercise in workout.ownexercise.all %}
+                        <div>
+                            <p>{{exercise.name}}</p>
+                        </div>
+                        <hr />
+                        {% endfor %}
                     </div>
                 </div>
                 <hr><br />
