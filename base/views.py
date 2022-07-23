@@ -69,22 +69,28 @@ def registerPage(request):
 
 
 def home(request):
-    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    # q = request.GET.get('q') if request.GET.get('q') != None else ''
 
+    # rooms = Room.objects.filter(
+    #     Q(topic__name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
+    #     Q(name__icontains=q) |
+    #     Q(description__icontains=q)
+    #     )
 
-    rooms = Room.objects.filter(
-        Q(topic__name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
-        Q(name__icontains=q) |
-        Q(description__icontains=q)
-        )
+    # topics = Topic.objects.all()[0:5]
+    # room_count = rooms.count()
+    # room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))
 
-    topics = Topic.objects.all()[0:5]
-    room_count = rooms.count()
-    room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))
+    # context_old = {'rooms':rooms, 'topics':topics, 'room_count':room_count,
+    #             'room_messages':room_messages}
 
-    context = {'rooms':rooms, 'topics':topics, 'room_count':room_count,
-                'room_messages':room_messages}
-    return render(request, 'base/home.html', context)
+    if request.user.is_authenticated:
+        workouts = Workout.objects.filter(
+            user=request.user, completed = 'YES'
+            )[0:5]
+        return render(request, 'base/home.html', {'workouts':workouts})
+    else:
+        return render(request, 'base/home.html', {})
 
 def room(request, pk):
     room = Room.objects.get(id=pk)
@@ -104,11 +110,16 @@ def room(request, pk):
     return render(request, 'base/room.html', context)
 
 def userProfile(request, pk):
-    user = User.objects.get(id=pk)
-    rooms = user.room_set.all()
-    room_messages = user.message_set.all()
-    topics = Topic.objects.all()
-    context = {'user':user, 'rooms':rooms, 'room_messages':room_messages, 'topics':topics}
+    # user = User.objects.get(id=pk)
+    # rooms = user.room_set.all()
+    # room_messages = user.message_set.all()
+    # topics = Topic.objects.all()
+    # context = {'user':user, 'rooms':rooms, 'room_messages':room_messages, 'topics':topics}
+    workouts = Workout.objects.filter(
+        user=request.user, completed = 'YES'
+        )[0:5]
+
+    context ={'workouts':workouts}
     return render(request, 'base/profile.html', context)
 
 
@@ -217,9 +228,10 @@ def exerciseLibrary(request):
         )
 
     ownexercises = OwnExercise.objects.filter(
-        Q(name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
+        Q(user=request.user) &
+        (Q(name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
         Q(description__icontains=q) |
-        Q(bodypart_trained__name__icontains=q)
+        Q(bodypart_trained__name__icontains=q))
         )
         
     totalexercises = list(chain(exercises, ownexercises))
@@ -235,7 +247,11 @@ def startWorkout(request):
         workout.save()
         return redirect('workout')
 
-    context = {}
+    workouts = Workout.objects.filter(
+        user=request.user, completed = 'YES'
+        )[0:5]
+
+    context = {'workouts':workouts}
     return render(request, 'base/startworkout.html', context)
 
 @login_required(login_url='login')
@@ -258,9 +274,10 @@ def workout(request):
         )
 
     ownexercises = OwnExercise.objects.filter(
-        Q(name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
+        Q(user=request.user) &
+        (Q(name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
         Q(description__icontains=q) |
-        Q(bodypart_trained__name__icontains=q)
+        Q(bodypart_trained__name__icontains=q))
         )
 
     if cancelbtn != None:

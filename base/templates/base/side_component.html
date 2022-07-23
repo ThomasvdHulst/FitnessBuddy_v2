@@ -1,0 +1,40 @@
+{% if request.user.is_authenticated %}
+
+<div class="activities">
+    <div class="activities__header">
+      <h2>Latest workouts</h2>
+    </div>
+
+    {% if workouts %}
+    {% for workout in workouts %}
+    <div class="activities__box">
+      <div class="activities__boxHeader roomListRoom__header">
+        <a href="{% url 'all-workouts' %}" class="roomListRoom__author">
+          <p>
+            {{workout.name}}
+          </p>
+        </a>
+      </div>
+
+      
+      <div class="activities__boxContent">
+        <div class="activities__boxRoomContent">
+            <ul>
+                {% for exercise in workout.exercise.all %}
+                <li>{{exercise.name}}</li>
+                {% endfor %}
+                {% for exercise in workout.ownexercise.all %}
+                <li>{{exercise.name}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p style="text-align: center;">You haven't completed your first workout yet!</p>
+    {% endif %}
+    
+  </div>
+
+  {% endif %}

@@ -15,6 +15,31 @@
 }
 
 /*========== Own styling ==========*/
+
+.set > label {
+  background-color: white;
+  padding: 5px 5px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 4px;
+}
+
+/* .set svg {
+  fill: var(black);
+  width: 10px;
+  height: 2rem;
+  margin-left: 1rem;
+} */
+
+.set input {
+  width: 3rem;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: black;
+}
+
 .title h2 {
   justify-content: space-between;
   align-items: center;
