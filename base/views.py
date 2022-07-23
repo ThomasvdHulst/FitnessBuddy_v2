@@ -17,20 +17,19 @@ def loginPage(request):
     if request.method == 'POST':
         email = request.POST.get('email').lower()
         password = request.POST.get('password')
-        print(User.objects.all())
 
         try:
             user = User.objects.get(email=email)
         except:
-            messages.error(request, 'User does not exist')
+            pass
 
         user = authenticate(request, email=email, password=password) 
 
         if user is not None:
-            login(request, user) #adds session in database
-            return redirect('home')
+             login(request, user) #adds session in database
+             return redirect('home')
         else:
-            messages.error(request, 'Username OR password does not exist')
+             messages.error(request, 'Username OR password is not correct, please try again.')
 
 
     context = {'page':page}
@@ -49,6 +48,7 @@ def registerPage(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.username.lower()
+            user.email = user.email.lower()
             user.save()
             login(request, user)
             return redirect('home')
@@ -60,6 +60,8 @@ def registerPage(request):
             messages.error(request, 'Please create a password with atleast 8 characters.')
         elif request.POST.get('password1') != request.POST.get('password2'):
             messages.error(request, 'Please fill in the same passwords.')
+        else:
+            messages.error(request, 'Email/Username already taken.')
 
     return render(request, 'base/login_register.html', {'form':form})
 
