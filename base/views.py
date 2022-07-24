@@ -46,6 +46,8 @@ def logoutUser(request):
 
 def registerPage(request):
     form = MyUserCreationForm()
+    statements = Statement.objects.all()
+
     if request.method == 'POST':
         form = MyUserCreationForm(request.POST)
         if form.is_valid():
@@ -53,6 +55,11 @@ def registerPage(request):
             user.username = user.username.lower()
             user.email = user.email.lower()
             user.save()
+
+            for statement in statements:
+                user.statements_list.add(statement)
+            user.save()
+
             login(request, user)
             return redirect('home')
         elif any(char.isdigit() for char in request.POST.get('name')):
@@ -371,7 +378,7 @@ def createExercise(request):
 
 @login_required(login_url='login')
 def knowledge(request):
-    statements = Statement.objects.all()
+    statements = request.user.statements_list.all()
 
     saved = request.POST.get('save')
 
@@ -383,7 +390,10 @@ def knowledge(request):
                         statement.completed = False
                     
                     statement.save()
+        request.user.completed_knowledge_statement = True
+        request.user.save()
 
+        messages.success(request, 'Well done! Lets gets working!')
         return render(request, 'base/knowledge.html', {'statements':statements})
 
     context = {'statements':statements}

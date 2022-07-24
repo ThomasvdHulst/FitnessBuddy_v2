@@ -2,11 +2,19 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
+class Statement(models.Model):
+    name = models.CharField(max_length=100)
+    completed = models.BooleanField()
+
+    def __str__(self):
+        return self.name
+
 class User(AbstractUser):
     name = models.CharField(max_length=200, null=True)
     email = models.EmailField(null=True, unique=True)
     bio = models.TextField(null=True)
     completed_knowledge_statement = models.BooleanField(default=False)
+    statements_list = models.ManyToManyField(Statement)
 
     avatar = models.ImageField(null=True, default="avatar.svg")
 
@@ -52,14 +60,6 @@ class Workout(models.Model):
 
     class Meta:
         ordering = ['-updated', '-created']
-
-    def __str__(self):
-        return self.name
-
-
-class Statement(models.Model):
-    name = models.CharField(max_length=100)
-    completed = models.BooleanField()
 
     def __str__(self):
         return self.name
