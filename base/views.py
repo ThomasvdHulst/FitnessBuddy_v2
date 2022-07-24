@@ -373,5 +373,18 @@ def createExercise(request):
 def knowledge(request):
     statements = Statement.objects.all()
 
+    saved = request.POST.get('save')
+
+    if saved != None:
+        for statement in statements:
+                    if request.POST.get("c" + str(statement.id)) == "clicked":
+                        statement.completed = True
+                    else:
+                        statement.completed = False
+                    
+                    statement.save()
+
+        return render(request, 'base/knowledge.html', {'statements':statements})
+
     context = {'statements':statements}
     return render(request, 'base/knowledge.html', context)

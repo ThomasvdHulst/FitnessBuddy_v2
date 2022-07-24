@@ -29,16 +29,38 @@
                     {% endif %}
                 </div>
 
-                {% for statement in statements %}
-                <div class="card mt-2">
-                    <div class="card-header">
-                        <div style="float:left ;">
-                            <strong>{{statement.name}}</strong>
+                <form method="post" action="#">
+                {% csrf_token %}
+                    {% for statement in statements %}
+                    <div class="card mt-2">
+                        <div class="card-header">
+                            <div style="float:left ;">
+                                <strong>{{statement.name}}</strong>
+                            </div>
+                            <div style="float:right;">
+                                <div class="form-check">
+                                    {% if statement.completed == True %}
+                                        <input type="checkbox", value="clicked", name="c{{statement.id}}" checked>
+                                    {% else %}
+                                        <input type="checkbox", value="clicked", name="c{{statement.id}}">
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <hr>
-                {% endfor %} 
+                    <hr>
+                    {% endfor %} 
+
+
+                    <div style="float:right;">
+                        <div class="form__action">
+                            <button class="btn btn--main" type="submit" name="save">Save</button>
+                        </div>
+                    </div>
+                    <br />
+
+
+                </form>
             </div>
         </div>
         <!-- Room List End -->

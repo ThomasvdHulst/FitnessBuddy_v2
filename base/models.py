@@ -59,7 +59,7 @@ class Workout(models.Model):
 
 class Statement(models.Model):
     name = models.CharField(max_length=100)
-    completed = models.BooleanField(default=False)
+    completed = models.BooleanField()
 
     def __str__(self):
         return self.name
