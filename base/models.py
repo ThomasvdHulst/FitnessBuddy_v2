@@ -6,6 +6,7 @@ class User(AbstractUser):
     name = models.CharField(max_length=200, null=True)
     email = models.EmailField(null=True, unique=True)
     bio = models.TextField(null=True)
+    completed_knowledge_statement = models.BooleanField(default=False)
 
     avatar = models.ImageField(null=True, default="avatar.svg")
 
@@ -55,6 +56,13 @@ class Workout(models.Model):
     def __str__(self):
         return self.name
 
+
+class Statement(models.Model):
+    name = models.CharField(max_length=100)
+    completed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
 
 class Topic(models.Model):
     name = models.CharField(max_length=200)

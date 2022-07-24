@@ -36,6 +36,12 @@
             Your Workouts
           </a>
         </div>
+
+        <div>
+          <a href="{% url 'knowledge' %}">
+            Your knowledge
+          </a>
+        </div>
       {% endif %}
 
       {% if request.user.is_staff %}

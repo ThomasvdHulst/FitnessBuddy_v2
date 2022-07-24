@@ -1,0 +1,54 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <main class="layout layout--3">
+      <div class="container">
+        <div>
+
+        </div>
+
+        <!-- Room List Start -->
+        <div class="roomList">
+            <div class="title">
+                <h3>Keep track of your knowledge</h3>
+                <p>How experienced are you?</p>
+            </div>
+
+            <div class="roomListRoom">
+                <div style="text-align: center;">
+                    <h2>Welcome {{ request.user.name }}!</h2>
+                    <h3>Here you can track everything you already know, learned or want to learn about fitness! The statements on
+                        this page are designed to help you in your fitness-journey, step by step and help you get the information you need,
+                        on the most easy way possible!
+                    </h3>
+                    <br />
+                    {% if not request.user.completed_knowledge_statement %}
+                    <h4>Since you just created your account, we ask you to fill in the following statments first, so we can recommend
+                        you the most accurate things! Trust me, it's worth it!
+                    </h4>
+                    {% endif %}
+                </div>
+
+                {% for statement in statements %}
+                <div class="card mt-2">
+                    <div class="card-header">
+                        <div style="float:left ;">
+                            <strong>{{statement.name}}</strong>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                {% endfor %} 
+            </div>
+        </div>
+        <!-- Room List End -->
+
+        <!-- Activities Start -->
+        <div>
+
+        </div>
+        <!-- Activities End -->
+      </div>
+    </main>
+
+{% endblock %}

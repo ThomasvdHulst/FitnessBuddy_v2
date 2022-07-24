@@ -1,10 +1,11 @@
+from multiprocessing import context
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q #Lets you use and/or for filter
 from django.contrib.auth import authenticate, login, logout 
-from .models import Room, Topic, Message, User, Exercise, Workout, BodyPart, OwnExercise
+from .models import Room, Topic, Message, User, Exercise, Workout, BodyPart, OwnExercise, Statement
 from .forms import ExerciseForm, RoomForm, UserForm, MyUserCreationForm
 
 from itertools import chain
@@ -351,6 +352,7 @@ def deleteWorkout(request, pk):
         return redirect('all-workouts')
     return render(request, 'base/delete.html', {'obj':workout})
 
+@login_required(login_url='login')
 def createExercise(request):
     form = ExerciseForm()
 
@@ -366,3 +368,10 @@ def createExercise(request):
 
     context ={'form':form}
     return render(request, 'base/create_exercise.html', context)
+
+@login_required(login_url='login')
+def knowledge(request):
+    statements = Statement.objects.all()
+
+    context = {'statements':statements}
+    return render(request, 'base/knowledge.html', context)
