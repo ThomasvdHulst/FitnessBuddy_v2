@@ -1,4 +1,5 @@
 from multiprocessing import context
+from unicodedata import name
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
@@ -29,8 +30,20 @@ def loginPage(request):
         user = authenticate(request, email=email, password=password) 
 
         if user is not None:
-             login(request, user) #adds session in database
-             return redirect('home')
+            login(request, user) #adds session in database
+
+
+            #ONLY USED FOR UPDATES IN STATEMENTS
+            # adminstatements = Statement.objects.filter(
+            #     Q(user='2')
+            #     )
+
+            # for statement in adminstatements:
+            #     statement.pk = None
+            #     statement.user = request.user
+            #     statement.save()
+
+            return redirect('home')
         else:
              messages.error(request, 'Username OR password is not correct, please try again.')
 
@@ -46,7 +59,6 @@ def logoutUser(request):
 
 def registerPage(request):
     form = MyUserCreationForm()
-    statements = Statement.objects.all()
 
     if request.method == 'POST':
         form = MyUserCreationForm(request.POST)
@@ -56,11 +68,18 @@ def registerPage(request):
             user.email = user.email.lower()
             user.save()
 
-            for statement in statements:
-                user.statements_list.add(statement)
-            user.save()
+            adminstatements = Statement.objects.filter(
+                Q(user='2')
+                )
 
             login(request, user)
+
+            for statement in adminstatements:
+                statement.pk = None
+                statement.user = request.user
+                statement.save()
+
+            
             return redirect('home')
         elif any(char.isdigit() for char in request.POST.get('name')):
              messages.error(request, 'Please only use letters for your name.')
@@ -378,18 +397,20 @@ def createExercise(request):
 
 @login_required(login_url='login')
 def knowledge(request):
-    statements = request.user.statements_list.all()
+    statements = Statement.objects.filter(
+        Q(user=request.user)
+        )
 
     saved = request.POST.get('save')
 
     if saved != None:
         for statement in statements:
-                    if request.POST.get("c" + str(statement.id)) == "clicked":
-                        statement.completed = True
-                    else:
-                        statement.completed = False
+            if request.POST.get("c" + str(statement.id)) == "clicked":
+                statement.completed = True
+            else:
+                statement.completed = False
                     
-                    statement.save()
+            statement.save()
         request.user.completed_knowledge_statement = True
         request.user.save()
 
