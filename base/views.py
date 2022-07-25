@@ -1,6 +1,7 @@
 from multiprocessing import context
 from unicodedata import name
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -15,15 +16,44 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes, force_str, DjangoUnicodeDecodeError
+from .utils import generate_token
+from django.core.mail import EmailMessage
+from django.conf import settings
+
 def send_activation_email(request, user):
     current_site = get_current_site(request)    #Gives domain
     email_subject = 'Activate your account'
-    email_body = render_to_string('authentication/activate.html', {
+    email_body = render_to_string('base/activate.html', {
         'user':user,
         'domain':current_site,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)), 
-        'token':
+        'token': generate_token.make_token(user)
     })
+
+    email = EmailMessage(subject=email_subject, body=email_body, 
+        from_email= settings.EMAIL_FROM_USER,
+        to=[user.email]
+         )
+
+    email.send()
+
+def activate_user(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64)) 
+
+        user = User.objects.get(pk=uid)
+        
+    except Exception as e:
+        user=None
+    
+    if user and generate_token.check_token(user, token):
+        user.is_email_verified = True
+        user.save()
+
+        messages.success(request, 'Email verified, welcome {{user.username}}!')
+        return redirect(reverse('login'))
+
+    return render(request, 'base/activate-failed.html', {"user":user})
 
 
 
@@ -90,23 +120,21 @@ def registerPage(request):
             user.email = user.email.lower()
             user.save()
 
-
-            send_activation_email(request, user)
-
             adminstatements = Statement.objects.filter(
                 Q(user='2')
                 )
 
-
-            login(request, user)
 
             for statement in adminstatements:
                 statement.pk = None
                 statement.user = request.user
                 statement.save()
 
+
+            send_activation_email(request, user)
+            messages.success(request, 'An mail has been sent to your email-adress, please verify your account.')
             
-            return redirect('home')
+            return redirect('login')
         elif any(char.isdigit() for char in request.POST.get('name')):
              messages.error(request, 'Please only use letters for your name.')
         elif len(request.POST.get('name')) < 2:

@@ -29,4 +29,6 @@ urlpatterns = [
     path('delete-workout/<str:pk>/', views.deleteWorkout, name="delete-workout"),
     path('create-exercise', views.createExercise, name="create-exercise"),
     path('knowledge', views.knowledge, name="knowledge"),
+
+    path('activate-user/<uidb64>/<token>', views.activate_user, name='activate'),
 ]
