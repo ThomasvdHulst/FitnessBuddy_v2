@@ -1,6 +1,7 @@
 from django.forms import ModelForm
 from .models import User, OwnExercise
-from django.contrib.auth.forms import UserCreationForm  
+from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
 
 class MyUserCreationForm(UserCreationForm):
     class Meta:

@@ -123,6 +123,17 @@ def registerPage(request):
 
     if request.method == 'POST':
         form = MyUserCreationForm(request.POST)
+
+        username_taken = False
+        for user in User.objects.all():
+            if user.username == request.POST.get('username'):
+                username_taken = True
+
+        email_taken = False
+        for user in User.objects.all():
+            if user.email == request.POST.get('email'):
+                email_taken = True
+
         if form.is_valid():
             user = form.save(commit=False)
             user.username = user.username.lower()
@@ -152,6 +163,12 @@ def registerPage(request):
             messages.error(request, 'Please create a password with atleast 8 characters.')
         elif request.POST.get('password1') != request.POST.get('password2'):
             messages.error(request, 'Please fill in the same passwords.')
+        elif username_taken:
+            messages.error(request, 'This username is already taken sadly, please choose another one!')
+        elif email_taken:
+            messages.error(request, 'There already exists an account with this email, please log in with this email or choose another one to create an account.')
+        elif "@" in request.POST.get('email') == False:
+            messages.error(request, 'Please fill in an correct email-adress.') 
         else:
             messages.error(request, 'Email/Username already taken.')
 
