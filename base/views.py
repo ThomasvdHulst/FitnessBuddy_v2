@@ -1,5 +1,3 @@
-from multiprocessing import context
-from unicodedata import name
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.http import HttpResponse
@@ -7,8 +5,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q #Lets you use and/or for filter
 from django.contrib.auth import authenticate, login, logout 
-from .models import Room, Topic, Message, User, Exercise, Workout, BodyPart, OwnExercise, Statement
-from .forms import ExerciseForm, RoomForm, UserForm, MyUserCreationForm
+from .models import User, Exercise, Workout, BodyPart, OwnExercise, Statement
+from .forms import ExerciseForm, UserForm, MyUserCreationForm
 
 from itertools import chain
 
@@ -19,6 +17,16 @@ from django.utils.encoding import force_bytes, force_str, DjangoUnicodeDecodeErr
 from .utils import generate_token
 from django.core.mail import EmailMessage
 from django.conf import settings
+import threading
+
+class EmailThread(threading.Thread): #Makes sure user doesnt have to wait long for response
+    def __init__(self, email):
+        self.email = email
+        threading.Thread.__init__(self)
+
+    def run(self):
+        self.email.send()
+    
 
 def send_activation_email(request, user):
     current_site = get_current_site(request)    #Gives domain
@@ -35,7 +43,7 @@ def send_activation_email(request, user):
         to=[user.email]
          )
 
-    email.send()
+    EmailThread(email).start()
 
 def activate_user(request, uidb64, token):
     try:
@@ -50,8 +58,9 @@ def activate_user(request, uidb64, token):
         user.is_email_verified = True
         user.save()
 
-        messages.success(request, 'Email verified, welcome {{user.username}}!')
-        return redirect(reverse('login'))
+        login(request,user)
+        messages.success(request, 'Email verified, welcome ' + user.username)
+        return redirect(reverse('home'))
 
     return render(request, 'base/activate-failed.html', {"user":user})
 
@@ -77,7 +86,7 @@ def loginPage(request):
         user = authenticate(request, email=email, password=password) 
 
         
-        if not user.is_email_verified:
+        if not user.is_email_verified & user.is_staff == False:
             messages.success(request, 'Email is not verified.')
             return render(request, 'base/login_register.html', {'page':page})
 
@@ -87,7 +96,7 @@ def loginPage(request):
 
             #ONLY USED FOR UPDATES IN STATEMENTS
             # adminstatements = Statement.objects.filter(
-            #     Q(user='2')
+            #     Q(user='1')
             #     )
 
             # for statement in adminstatements:
@@ -121,13 +130,13 @@ def registerPage(request):
             user.save()
 
             adminstatements = Statement.objects.filter(
-                Q(user='2')
+                Q(user='1')
                 )
 
 
             for statement in adminstatements:
                 statement.pk = None
-                statement.user = request.user
+                statement.user = user
                 statement.save()
 
 
@@ -150,21 +159,6 @@ def registerPage(request):
 
 
 def home(request):
-    # q = request.GET.get('q') if request.GET.get('q') != None else ''
-
-    # rooms = Room.objects.filter(
-    #     Q(topic__name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
-    #     Q(name__icontains=q) |
-    #     Q(description__icontains=q)
-    #     )
-
-    # topics = Topic.objects.all()[0:5]
-    # room_count = rooms.count()
-    # room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))
-
-    # context_old = {'rooms':rooms, 'topics':topics, 'room_count':room_count,
-    #             'room_messages':room_messages}
-
     if request.user.is_authenticated:
         workouts = Workout.objects.filter(
             user=request.user, completed = 'YES'
@@ -173,29 +167,7 @@ def home(request):
     else:
         return render(request, 'base/home.html', {})
 
-def room(request, pk):
-    room = Room.objects.get(id=pk)
-    room_messages = room.message_set.all() #Gives set of messages that are related
-    participants = room.participants.all()
-
-    if request.method == 'POST':
-        message = Message.objects.create(
-            user = request.user,
-            room = room,
-            body = request.POST.get('body')
-        )
-        room.participants.add(request.user)
-        return redirect('room', pk=room.id)
-
-    context = {'room':room, 'room_messages': room_messages, 'participants': participants}
-    return render(request, 'base/room.html', context)
-
 def userProfile(request, pk):
-    # user = User.objects.get(id=pk)
-    # rooms = user.room_set.all()
-    # room_messages = user.message_set.all()
-    # topics = Topic.objects.all()
-    # context = {'user':user, 'rooms':rooms, 'room_messages':room_messages, 'topics':topics}
     workouts = Workout.objects.filter(
         user=request.user, completed = 'YES'
         )[0:5]
@@ -203,72 +175,6 @@ def userProfile(request, pk):
     context ={'workouts':workouts}
     return render(request, 'base/profile.html', context)
 
-
-
-@login_required(login_url='login')
-def createRoom(request):
-    form = RoomForm()
-    topics = Topic.objects.all()
-
-    if request.method == 'POST':
-        topic_name = request.POST.get('topic')
-        topic, created = Topic.objects.get_or_create(name=topic_name) #Lets you choose a created topic or create a new one
-
-        Room.objects.create(
-            host = request.user,
-            topic = topic,
-            name = request.POST.get('name'),
-            description = request.POST.get('description'),
-        )
-        return redirect('home')
-
-    context = {'form':form, 'topics':topics}
-    return render(request, 'base/room_form.html', context)
-
-@login_required(login_url='login')
-def updateRoom(request, pk):
-    room = Room.objects.get(id=pk)
-    form = RoomForm(instance=room) #Prefilled form 
-    topics = Topic.objects.all()
-
-    if request.user != room.host:
-        return HttpResponse('You are not allowed here!')
-
-    if request.method == 'POST':
-        topic_name = request.POST.get('topic')
-        topic, created = Topic.objects.get_or_create(name=topic_name) #Lets you choose a created topic or create a new one
-        room.name = request.POST.get('name')
-        room.topic = topic
-        room.description = request.POST.get('description')
-        room.save()
-        return redirect('home')
-
-    context = {'form':form, 'topics':topics, 'room':room}
-    return render(request, 'base/room_form.html', context)
-
-@login_required(login_url='login')
-def deleteRoom(request, pk):
-    room = Room.objects.get(id=pk)
-
-    if request.user != room.host:
-        return HttpResponse('You are not allowed here!')
-
-    if request.method == 'POST':
-        room.delete()
-        return redirect('home')
-    return render(request, 'base/delete.html', {'obj':room})
-
-@login_required(login_url='login')
-def deleteMessage(request, pk):
-    message = Message.objects.get(id=pk)
-
-    if request.user != message.user:
-        return HttpResponse('You are not allowed here!')
-
-    if request.method == 'POST':
-        message.delete()
-        return redirect('home')
-    return render(request, 'base/delete.html', {'obj':message})
 
 @login_required(login_url='login')
 def updateUser(request):
@@ -284,23 +190,11 @@ def updateUser(request):
 
     return render(request, 'base/update-user.html', {'form':form})
 
-def topicsPage(request):
-    q = request.GET.get('q') if request.GET.get('q') != None else ''
-    topics = Topic.objects.filter(name__icontains = q)
-    return render(request, 'base/topics.html', {'topics': topics})
-
-def activityPage(request):
-    room_messages = Message.objects.all()
-    return render(request, 'base/activity.html', {'room_messages':room_messages})
-
-
-
 
 def exerciseLibrary(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
 
     bodyparts = BodyPart.objects.all()
-
 
     exercises = Exercise.objects.filter(
         Q(name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
