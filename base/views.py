@@ -10,6 +10,23 @@ from .models import Room, Topic, Message, User, Exercise, Workout, BodyPart, Own
 from .forms import ExerciseForm, RoomForm, UserForm, MyUserCreationForm
 
 from itertools import chain
+
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes, force_str, DjangoUnicodeDecodeError
+def send_activation_email(request, user):
+    current_site = get_current_site(request)    #Gives domain
+    email_subject = 'Activate your account'
+    email_body = render_to_string('authentication/activate.html', {
+        'user':user,
+        'domain':current_site,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)), 
+        'token':
+    })
+
+
+
 # Create your views here.
 
 def loginPage(request):
@@ -28,6 +45,11 @@ def loginPage(request):
             pass
 
         user = authenticate(request, email=email, password=password) 
+
+        
+        if not user.is_email_verified:
+            messages.success(request, 'Email is not verified.')
+            return render(request, 'base/login_register.html', {'page':page})
 
         if user is not None:
             login(request, user) #adds session in database
@@ -68,9 +90,13 @@ def registerPage(request):
             user.email = user.email.lower()
             user.save()
 
+
+            send_activation_email(request, user)
+
             adminstatements = Statement.objects.filter(
                 Q(user='2')
                 )
+
 
             login(request, user)
 

@@ -2,11 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
-
-
 class User(AbstractUser):
     name = models.CharField(max_length=200, null=True)
     email = models.EmailField(null=True, unique=True)
+    is_email_verified = models.BooleanField(default=False)
     bio = models.TextField(null=True)
     completed_knowledge_statement = models.BooleanField(default=False)
 
