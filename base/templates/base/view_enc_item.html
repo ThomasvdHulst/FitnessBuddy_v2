@@ -1,0 +1,58 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <main class="layout layout--3">
+      <div class="container">
+        <div class="topics">
+            <div class="topics__header">
+              <h2>Search on specific topics:</h2>
+            </div>
+            <ul class="topics__list">
+              <li>
+                <a href="{% url 'encyclopedia' %}" class="active">All posts</a>
+              </li>
+              {% for topic in topics %}
+              <li>
+                <a href="{% url 'encyclopedia' %}?q={{topic.name}}">{{topic.name}}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+        <!-- Room List Start -->
+        <div class="roomList">
+            <div class="title">
+                <h3><a href="{% url 'encyclopedia' %}">Fitness Encyclopedia</a></h3>
+            </div>
+
+            <div class="roomListRoom">
+                <div class="card mt-2">
+                    <div class="card-header">
+                        <div style="float:left ;">
+                            <strong>{{item.name}}</strong>
+                        </div>
+                        <div style="float:right ;">
+                            made {{item.created|timesince}} ago
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div>
+                            <p>{{item.body}}</p>
+                        </div>
+                        <br />
+                        <div>
+                            <p>Want to view more posts on the topic '<a href="{% url 'encyclopedia' %}?q={{item.topic.name}}">{{item.topic}}</a>'? Click <a href="{% url 'encyclopedia' %}?q={{item.topic.name}}">here</a>!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Room List End -->
+
+        <!-- Activities Start -->
+        {% include 'base/side_component.html' %}
+        <!-- Activities End -->
+      </div>
+    </main>
+
+{% endblock %}

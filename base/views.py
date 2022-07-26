@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q #Lets you use and/or for filter
 from django.contrib.auth import authenticate, login, logout 
-from .models import User, Exercise, Workout, BodyPart, OwnExercise, Statement
+from .models import User, Exercise, Workout, BodyPart, OwnExercise, Statement, EncItem, EncTopic
 from .forms import ExerciseForm, UserForm, MyUserCreationForm
 
 from itertools import chain
@@ -85,12 +85,11 @@ def loginPage(request):
 
         user = authenticate(request, email=email, password=password) 
 
-        
-        if not user.is_email_verified & user.is_staff == False:
-            messages.success(request, 'Email is not verified.')
-            return render(request, 'base/login_register.html', {'page':page})
-
         if user is not None:
+            if not user.is_email_verified & user.is_staff == False:
+                messages.success(request, 'Email is not verified.')
+                return render(request, 'base/login_register.html', {'page':page})
+
             login(request, user) #adds session in database
 
 
@@ -106,7 +105,7 @@ def loginPage(request):
 
             return redirect('home')
         else:
-             messages.error(request, 'Username OR password is not correct, please try again.')
+             messages.error(request, 'Email or password is not correct, please try again.')
 
 
     context = {'page':page}
@@ -312,7 +311,7 @@ def workoutCompleted(request):
     lastWorkout = Workout.objects.filter(
         Q(user__exact=request.user) &
         Q(completed='YES')
-    ).last()
+    ).first()
     lastWorkoutExercises = lastWorkout.exercise.all()
     lastWorkoutOwnExercises = lastWorkout.ownexercise.all()
 
@@ -384,3 +383,32 @@ def knowledge(request):
 
     context = {'statements':statements}
     return render(request, 'base/knowledge.html', context)
+
+def encyclopedia(request):
+    items = EncItem.objects.all()
+    topics = EncTopic.objects.all()
+
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+
+    items = EncItem.objects.filter(
+        Q(name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
+        Q(topic__name__icontains=q)
+        )
+
+    workouts = Workout.objects.filter(
+        user=request.user, completed = 'YES'
+        )[0:5]
+
+    context = {'items':items, 'topics':topics, 'workouts':workouts}
+    return render(request, 'base/encyclopedia.html', context)
+
+def viewEncItem(request, pk):
+    item = EncItem.objects.get(id=pk)
+    topics = EncTopic.objects.all()
+
+    workouts = Workout.objects.filter(
+        user=request.user, completed = 'YES'
+        )[0:5]
+
+    context = {'item':item, 'topics':topics, 'workouts':workouts}
+    return render(request, 'base/view_enc_item.html', context)

@@ -19,6 +19,8 @@ urlpatterns = [
     path('delete-workout/<str:pk>/', views.deleteWorkout, name="delete-workout"),
     path('create-exercise', views.createExercise, name="create-exercise"),
     path('knowledge', views.knowledge, name="knowledge"),
+    path('encyclopedia', views.encyclopedia, name="encyclopedia"),
+    path('view-enc-item/<str:pk>/', views.viewEncItem, name="view-enc-item"),
 
     path('activate-user/<uidb64>/<token>', views.activate_user, name='activate'),
 ]

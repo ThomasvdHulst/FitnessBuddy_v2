@@ -64,3 +64,22 @@ class Workout(models.Model):
 
     def __str__(self):
         return self.name
+
+class EncTopic(models.Model):
+    name = models.CharField(max_length=30, null=True)
+
+    def __str__(self):
+        return self.name
+
+class EncItem(models.Model):
+    name = models.CharField(max_length=100, null=True)
+    body = models.TextField(null=True)
+    topic = models.ForeignKey(EncTopic, on_delete=models.CASCADE, null=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-updated', '-created']
+
+    def __str__(self):
+        return self.name

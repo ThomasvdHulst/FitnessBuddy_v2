@@ -6,6 +6,7 @@
   --color-dark: #131954;
   --color-dark-medium: #202a8a;
   --color-dark-light: #2936c2;
+  --color-dark-light-light: rgb(27, 77, 240) ;
   --color-light: #e5e5e5;
   --color-gray: #8b8b8b;
   --color-light-gray: #b2bdbd;
@@ -15,6 +16,29 @@
 }
 
 /*========== Own styling ==========*/
+
+
+.linkbar {
+  display: flex;
+  text-align: center;
+  margin: auto;
+
+}
+
+.baritem {
+  display: flex;
+  text-align: center;
+  margin-left: 60px;
+  margin-top: 10px;
+}
+
+.baritemlast {
+  display: flex;
+  text-align: center;
+  margin-left: 60px;
+  margin-right: 300px;
+  margin-top: 10px;
+}
 
 .set > label {
   background-color: white;
@@ -359,20 +383,28 @@ a {
 }
 
 .header > .container {
+
+  margin-left: 80px;
   display: flex;
-  gap: 9.5rem;
 }
 
-.header__logo,
 .header__user {
   display: flex;
   gap: 2rem;
   align-items: center;
+  margin-left: 30px;
+}
+
+.header__logo {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  margin-left: 0px;
 }
 
 .header__logo > img {
-  height: 3.2rem;
-  width: 3.2rem;
+  height: 4rem;
+  width: 4rem;
 }
 
 .header__logo > h1 {

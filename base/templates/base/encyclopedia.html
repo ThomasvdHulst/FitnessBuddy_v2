@@ -1,0 +1,78 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <main class="layout layout--3">
+      <div class="container">
+        <div class="topics">
+            <div class="topics__header">
+              <h2>Search on specific topics:</h2>
+            </div>
+            <ul class="topics__list">
+              <li>
+                <a href="{% url 'encyclopedia' %}" class="active">All posts</a>
+              </li>
+              {% for topic in topics %}
+              <li>
+                <a href="{% url 'encyclopedia' %}?q={{topic.name}}">{{topic.name}}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+        <!-- Room List Start -->
+        <div class="roomList">
+            <div class="title">
+                <h3>Fitness Encyclopedia</h3>
+            </div>
+
+            <div class="roomListRoom">
+                <div style="text-align: center;">
+                    <h2>Welcome {%if request.user.is_authenticated %} {{ request.user.name }} {% endif %}!</h2>
+                    <h3>This is the famous Fitness Encyclopedia, a place where you can find posts about almost every
+                        possible subject in the beautiful sport of fitness!
+                    </h3>
+                    <br />
+                </div>
+
+                <form class="header__search" method="GET" action="{% url 'encyclopedia' %}">
+                    <label>
+                      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                        <title>search</title>
+                        <path
+                          d="M32 30.586l-10.845-10.845c1.771-2.092 2.845-4.791 2.845-7.741 0-6.617-5.383-12-12-12s-12 5.383-12 12c0 6.617 5.383 12 12 12 2.949 0 5.649-1.074 7.741-2.845l10.845 10.845 1.414-1.414zM12 22c-5.514 0-10-4.486-10-10s4.486-10 10-10c5.514 0 10 4.486 10 10s-4.486 10-10 10z"
+                        ></path>
+                      </svg>
+                      <input name="q" placeholder="Search for posts by name or related topic..." />
+                    </label>
+                </form>
+                <br />
+
+                {% if items %}
+                <h3>Newest Posts:</h3>
+                    {% for item in items %}
+                        <div class="card mt-2">
+                            <div class="card-header">
+                                <div style="float:left ;">
+                                    <strong><a href="{% url 'view-enc-item' item.id %}">{{item.name}}</a></strong>
+                                </div>
+                                <div style="float:right ;">
+                                    made {{item.created|timesince}} ago
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                    {% endfor %} 
+                {% else %}
+                    <h3>It seems like your search has no releated posts. Please check for spelling errors or formulation mistakes.</h3>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Room List End -->
+
+        <!-- Activities Start -->
+        {% include 'base/side_component.html' %}
+        <!-- Activities End -->
+      </div>
+    </main>
+
+{% endblock %}
