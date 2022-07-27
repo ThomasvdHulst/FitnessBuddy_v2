@@ -395,20 +395,30 @@ def encyclopedia(request):
         Q(topic__name__icontains=q)
         )
 
-    workouts = Workout.objects.filter(
-        user=request.user, completed = 'YES'
-        )[0:5]
 
-    context = {'items':items, 'topics':topics, 'workouts':workouts}
+    page = 1
+
+    if request.user.is_authenticated:
+        workouts = Workout.objects.filter(
+            user=request.user, completed = 'YES'
+            )[0:5]
+
+        context = {'items':items, 'topics':topics, 'workouts':workouts, 'page':page}
+        return render(request, 'base/encyclopedia.html', context)
+
+    context = {'items':items, 'topics':topics}
     return render(request, 'base/encyclopedia.html', context)
 
 def viewEncItem(request, pk):
     item = EncItem.objects.get(id=pk)
     topics = EncTopic.objects.all()
 
-    workouts = Workout.objects.filter(
-        user=request.user, completed = 'YES'
-        )[0:5]
+    if request.user.is_authenticated:
+        workouts = Workout.objects.filter(
+            user=request.user, completed = 'YES'
+            )[0:5]
+        context = {'item':item, 'topics':topics, 'workouts':workouts}
+        return render(request, 'base/view_enc_item.html', context)
 
-    context = {'item':item, 'topics':topics, 'workouts':workouts}
+    context = {'item':item, 'topics':topics}
     return render(request, 'base/view_enc_item.html', context)
