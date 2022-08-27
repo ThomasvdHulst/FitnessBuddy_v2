@@ -83,3 +83,23 @@ class EncItem(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ShopItemSection(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
+class ShopItem(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(null=True)
+    image = models.ImageField(null=True, blank=True)
+    price = models.FloatField(null=True)
+    section = models.ForeignKey(ShopItemSection, on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name

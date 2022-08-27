@@ -1,8 +1,9 @@
 {% autoescape off %}
 
-Hi {{user.username}}
+Welcome {{user.username}}!
 
-Please user the link below to verify your account.
+Awesome that you created an account with us, lets get buff together!
+Please use the link below to verify your account.
 
 http://{{domain}}{% url 'activate' uidb64=uid token=token %}
 

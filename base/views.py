@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q #Lets you use and/or for filter
 from django.contrib.auth import authenticate, login, logout 
-from .models import User, Exercise, Workout, BodyPart, OwnExercise, Statement, EncItem, EncTopic
+from .models import User, Exercise, Workout, BodyPart, OwnExercise, Statement, EncItem, EncTopic, ShopItem, ShopItemSection
 from .forms import ExerciseForm, UserForm, MyUserCreationForm
 
 from itertools import chain
@@ -422,3 +422,24 @@ def viewEncItem(request, pk):
 
     context = {'item':item, 'topics':topics}
     return render(request, 'base/view_enc_item.html', context)
+
+def shop(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+
+    sections = ShopItemSection.objects.all()
+
+    shopitems = ShopItem.objects.filter(
+        Q(name__icontains=q) | #icontains: look if a part of it matches, i makes in not capitalsensative
+        Q(description__icontains=q) |
+        Q(section__name__icontains=q)
+        )
+
+    context = {'sections':sections, 'shopitems':shopitems}
+    return render(request, 'base/shop.html', context)
+
+def viewShopItem(request, pk):
+    item = ShopItem.objects.get(id=pk)
+    sections = ShopItemSection.objects.all()
+
+    context = {'item':item, 'sections':sections}
+    return render(request, 'base/view_shop_item.html', context)

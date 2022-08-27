@@ -1,0 +1,65 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <main class="layout layout--3">
+      <div class="container">
+        <div class="topics">
+            <div class="topics__header">
+              <h2>Search on different sections:</h2>
+            </div>
+            <ul class="topics__list">
+              <li>
+                <a href="{% url 'shop' %}" class="active">All items</a>
+              </li>
+              {% for section in sections %}
+              <li>
+                <a href="{% url 'shop' %}?q={{section.name}}">{{section.name}}</a>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+        <!-- Room List Start -->
+        <div class="roomList">
+            <div class="roomListRoom">
+                <div class="card mt-2">
+                    <div class="card-header">                                
+                        <div style="float:left;">
+                            <strong>{{item.name}}</strong>
+                        </div>
+                        <div>
+                            &nbsp; €{{item.price}}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                      {% if item.image %}
+                        <div>
+                            <img class="image" src="{{ item.image.url }}">
+                        </div>
+                        <br/>
+                        <div>
+                            {{item.description}}
+                        </div>
+                        <br/>
+                        <div style="float:left ;">
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="form__action">
+                                    <button class="btn btn--main" type="submit" name="addtocart">Add to Cart</button>
+                                </div>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Room List End -->
+
+        <div>
+
+        </div>
+      </div>
+    </main>
+
+{% endblock %}

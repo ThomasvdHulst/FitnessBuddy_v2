@@ -21,6 +21,8 @@ urlpatterns = [
     path('knowledge', views.knowledge, name="knowledge"),
     path('encyclopedia', views.encyclopedia, name="encyclopedia"),
     path('view-enc-item/<str:pk>/', views.viewEncItem, name="view-enc-item"),
+    path('shop', views.shop, name="shop"),
+    path('view-shop-item/<str:pk>/', views.viewShopItem, name="view-shop-item"),
 
     path('activate-user/<uidb64>/<token>', views.activate_user, name='activate'),
 ]

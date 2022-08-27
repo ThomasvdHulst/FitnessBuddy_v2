@@ -1,0 +1,83 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    <main class="layout layout--3">
+      <div class="container">
+        <!-- Topics Start -->
+        <div class="topics">
+          <div class="topics__header">
+            <h2>Search on different sections:</h2>
+          </div>
+          <ul class="topics__list">
+            <li>
+              <a href="{% url 'shop' %}" class="active">All items</a>
+            </li>
+            {% for section in sections %}
+            <li>
+              <a href="{% url 'shop' %}?q={{section.name}}">{{section.name}}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      
+        <!-- Topics End -->
+
+        <!-- Room List Start -->
+        <div class="roomList">
+            <div class="roomListRoom">
+                <h1 style="text-align:center;">Welcome to the shop {{request.user.name}}!</h1>
+                <p style="text-align:center;">Browse here trough all the different items this shop has to offer!
+                </p>
+                <br />
+                <form class="header__search" method="GET" action="{% url 'shop' %}">
+                    <label>
+                      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                        <title>search</title>
+                        <path
+                          d="M32 30.586l-10.845-10.845c1.771-2.092 2.845-4.791 2.845-7.741 0-6.617-5.383-12-12-12s-12 5.383-12 12c0 6.617 5.383 12 12 12 2.949 0 5.649-1.074 7.741-2.845l10.845 10.845 1.414-1.414zM12 22c-5.514 0-10-4.486-10-10s4.486-10 10-10c5.514 0 10 4.486 10 10s-4.486 10-10 10z"
+                        ></path>
+                      </svg>
+                      <input name="q" placeholder="Search for shop-items..." />
+                    </label>
+                  </form>
+                  <nav class="header__menu">
+
+                <br />
+
+                {% for item in shopitems %}
+                <div class="card mt-2">
+                    <div class="card-header">                                
+                        <div style="float:left;">
+                            <strong><a href="{% url 'view-shop-item' item.id %}">{{item.name}}</a></strong>
+                        </div>
+                        <div>
+                            &nbsp; €{{item.price}}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                      {% if item.image %}
+                        <div>
+                            <a href="{% url 'view-shop-item' item.id %}"><img class="image" src="{{ item.image.url }}"></a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr><br />
+                {% empty %}
+                <div>
+                    <h3>Sadly no results for our shop-items have returned... Please check for spelling errors or try single words instead of senctences!</h3>
+                </div>
+                {% endfor %}
+            </div>  
+        </div>
+        <!-- Room List End -->
+
+        <!-- Activities Start -->
+        <div>
+          
+        </div>
+        <!-- Activities End -->
+      </div>
+    </main>
+
+{% endblock %}
