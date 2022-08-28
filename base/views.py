@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q #Lets you use and/or for filter
 from django.contrib.auth import authenticate, login, logout 
-from .models import User, Exercise, Workout, BodyPart, OwnExercise, Statement, EncItem, EncTopic, ShopItem, ShopItemSection
+from .models import User, Exercise, Workout, BodyPart, OwnExercise, Statement, EncItem, EncTopic, ShopItem, ShopItemSection, ShoppingCart
 from .forms import ExerciseForm, UserForm, MyUserCreationForm
 
 from itertools import chain
@@ -139,16 +139,20 @@ def registerPage(request):
             user.email = user.email.lower()
             user.save()
 
+            shoppingcart = ShoppingCart.objects.create(name=user.username)
+            user.shoppingcart = shoppingcart
+            user.save()
+
             adminstatements = Statement.objects.filter(
                 Q(user='1')
                 )
-
 
             for statement in adminstatements:
                 statement.pk = None
                 statement.user = user
                 statement.save()
 
+            
 
             send_activation_email(request, user)
             messages.success(request, 'An mail has been sent to your email-adress, please verify your account.')
@@ -296,7 +300,7 @@ def workout(request):
             return redirect('workout-completed')
         
         else:
-             messages.error(request, 'Please at a exercise before completing your workout.')
+            messages.error(request, 'Please at a exercise before completing your workout.')
 
     context = {'workout':workout, 'exercises':exercises, 'currentExercises':currentExercises, 'ownexercises':ownexercises, 'currentOwnExercises':currentOwnExercises}
     return render(request, 'base/workout.html', context)
@@ -423,6 +427,7 @@ def viewEncItem(request, pk):
     context = {'item':item, 'topics':topics}
     return render(request, 'base/view_enc_item.html', context)
 
+@login_required(login_url='login')
 def shop(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
 
@@ -437,9 +442,37 @@ def shop(request):
     context = {'sections':sections, 'shopitems':shopitems}
     return render(request, 'base/shop.html', context)
 
+@login_required(login_url='login')
 def viewShopItem(request, pk):
     item = ShopItem.objects.get(id=pk)
     sections = ShopItemSection.objects.all()
 
+    user = request.user
+
+    if request.method == 'POST':
+        user.shoppingcart.items.add(item)
+        messages.success(request, 'Item added to shopping cart!')
+        return redirect('shop')
+
     context = {'item':item, 'sections':sections}
     return render(request, 'base/view_shop_item.html', context)
+
+@login_required(login_url='login')
+def shoppingCart(request):
+    user = request.user
+
+    shoppingcart = user.shoppingcart
+    items = shoppingcart.items.all()
+
+    context = {'shoppingcart':shoppingcart, 'items':items}
+    return render(request, 'base/shopping_cart.html', context)
+
+@login_required(login_url='login')
+def deleteShopItem(request, pk):
+    user = request.user
+    item = user.shoppingcart.items.get(id=pk)
+
+    if request.method == 'POST':
+        user.shoppingcart.items.remove(item)
+        return redirect('shopping-cart')
+    return render(request, 'base/delete.html', {'obj':item})

@@ -2,12 +2,39 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
+class ShopItemSection(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
+class ShopItem(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(null=True)
+    image = models.ImageField(null=True, blank=True)
+    price = models.FloatField(null=True)
+    section = models.ForeignKey(ShopItemSection, on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+class ShoppingCart(models.Model):
+    name = models.CharField(max_length=100, null=True)
+    items = models.ManyToManyField(ShopItem)
+
+    def __str__(self):
+        return self.name
+
 class User(AbstractUser):
     name = models.CharField(max_length=200, null=True)
     email = models.EmailField(null=True, unique=True)
     is_email_verified = models.BooleanField(default=False)
     bio = models.TextField(null=True, blank=True)
     completed_knowledge_statement = models.BooleanField(default=False)
+    shoppingcart = models.ForeignKey(ShoppingCart, on_delete=models.CASCADE, null=True)
 
     avatar = models.ImageField(null=True, default="avatar.svg")
 
@@ -85,21 +112,4 @@ class EncItem(models.Model):
         return self.name
 
 
-class ShopItemSection(models.Model):
-    name = models.CharField(max_length=20)
 
-    def __str__(self):
-        return self.name
-
-class ShopItem(models.Model):
-    name = models.CharField(max_length=200)
-    description = models.TextField(null=True)
-    image = models.ImageField(null=True, blank=True)
-    price = models.FloatField(null=True)
-    section = models.ForeignKey(ShopItemSection, on_delete=models.CASCADE, null=True)
-
-    class Meta:
-        ordering = ['name']
-
-    def __str__(self):
-        return self.name

@@ -23,6 +23,8 @@ urlpatterns = [
     path('view-enc-item/<str:pk>/', views.viewEncItem, name="view-enc-item"),
     path('shop', views.shop, name="shop"),
     path('view-shop-item/<str:pk>/', views.viewShopItem, name="view-shop-item"),
+    path('shopping-cart', views.shoppingCart, name="shopping-cart"),
+    path('delete-shopitem/<str:pk>/', views.deleteShopItem, name="delete-shopitem"),
 
     path('activate-user/<uidb64>/<token>', views.activate_user, name='activate'),
 ]
